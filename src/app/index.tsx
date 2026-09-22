@@ -1,49 +1,39 @@
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { useState } from "react";
 import {
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-type Screen =
-  | "landing"
-  | "roles"
-  | "residentLogin"
-  | "tanodLogin"
-  | "signup";
+
+type Screen = "landing" | "roles";
 
 export default function Index() {
   const [screen, setScreen] = useState<Screen>("landing");
 
-  const goBack = () => {
-    if (screen === "roles") {
-      setScreen("landing");
-    } else if (
-      screen === "residentLogin" ||
-      screen === "tanodLogin" ||
-      screen === "signup"
-    ) {
-      setScreen("roles");
-    }
-  };
-
+  // =========================
+  // LANDING PAGE
+  // =========================
   if (screen === "landing") {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.landingContainer}>
           <View style={styles.logoArea}>
             <View style={styles.logoBox}>
-              <Ionicons name="location" size={48} color="#FFFFFF" />
-              <View style={styles.shieldSide} />
+              <Ionicons
+                name="location"
+                size={48}
+                color="#FFFFFF"
+              />
             </View>
 
-            <Text style={styles.landingTitle}>RondaWatch</Text>
+            <Text style={styles.landingTitle}>
+              RondaWatch
+            </Text>
 
             <Text style={styles.landingSubtitle}>
               Barangay safety and patrol, together
@@ -51,7 +41,11 @@ export default function Index() {
 
             <View style={styles.featureRow}>
               <View style={styles.featureCircle}>
-                <Ionicons name="location-outline" size={25} color="#202060" />
+                <Ionicons
+                  name="location-outline"
+                  size={25}
+                  color="#202060"
+                />
               </View>
 
               <View style={styles.featureCircle}>
@@ -63,7 +57,11 @@ export default function Index() {
               </View>
 
               <View style={styles.featureCircle}>
-                <Ionicons name="star-outline" size={25} color="#202060" />
+                <Ionicons
+                  name="star-outline"
+                  size={25}
+                  color="#202060"
+                />
               </View>
             </View>
 
@@ -78,7 +76,9 @@ export default function Index() {
               onPress={() => setScreen("roles")}
               activeOpacity={0.8}
             >
-              <Text style={styles.getStartedText}>Get Started</Text>
+              <Text style={styles.getStartedText}>
+                Get Started
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -96,380 +96,197 @@ export default function Index() {
     );
   }
 
-  if (screen === "roles") {
-    return (
-      <SafeAreaView style={styles.safeAreaWhite}>
-        <ScrollView
-          contentContainerStyle={styles.rolesContainer}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.rolesHeader}>
-            <TouchableOpacity onPress={goBack} style={styles.backButton}>
-              <Ionicons name="arrow-back" size={22} color="#222222" />
-            </TouchableOpacity>
-
-            <View style={styles.smallLogo}>
-              <Ionicons name="location" size={34} color="#FFFFFF" />
-            </View>
-
-            <Text style={styles.rolesTitle}>RondaWatch</Text>
-
-            <Text style={styles.rolesSubtitle}>
-              Sa Bawat Ronda, Ligtas ang Kapitbahayan.
-            </Text>
-          </View>
-
-          <View style={styles.identityHeader}>
-            <View>
-              <Text style={styles.identityTitle}>PUMILI NG</Text>
-              <Text style={styles.identityTitle}>PAGKAKAKILANLAN</Text>
-              <Text style={styles.identityDescription}>
-                Select Portal Account Role
-              </Text>
-            </View>
-
-            <View style={styles.securityBadge}>
-              <Ionicons
-                name="shield-checkmark-outline"
-                size={19}
-                color="#666666"
-              />
-              <View>
-                <Text style={styles.securityTop}>2-Factor</Text>
-                <Text style={styles.securityBottom}>Authentication</Text>
-              </View>
-            </View>
-          </View>
-
-          <TouchableOpacity
-            style={styles.portalCard}
-            onPress={() => setScreen("residentLogin")}
-            activeOpacity={0.85}
-          >
-            <View style={styles.portalIconResident}>
-              <Ionicons name="home" size={27} color="#4B63D8" />
-            </View>
-
-            <View style={styles.portalContent}>
-              <View style={styles.portalTitleRow}>
-                <Text style={styles.portalTitle}>Resident Portal</Text>
-                <View style={styles.residentTag}>
-                  <Text style={styles.residentTagText}>Resident</Text>
-                </View>
-              </View>
-
-              <Text style={styles.portalDescription}>
-                Real-time neighborhood incident reporting, safety
-                updates, and direct patrol coordination.
-              </Text>
-            </View>
-
-            <Ionicons
-              name="arrow-forward"
-              size={18}
-              color="#555555"
-              style={styles.portalArrow}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.portalCard}
-            onPress={() => setScreen("tanodLogin")}
-            activeOpacity={0.85}
-          >
-            <View style={styles.portalIconTanod}>
-              <Ionicons
-                name="shield-checkmark"
-                size={27}
-                color="#E7B72C"
-              />
-            </View>
-
-            <View style={styles.portalContent}>
-              <View style={styles.portalTitleRow}>
-                <Text style={styles.portalTitle}>
-                  Tanod & Officer Duty
-                </Text>
-
-                <View style={styles.tanodTag}>
-                  <Text style={styles.tanodTagText}>Dispatch</Text>
-                </View>
-              </View>
-
-              <Text style={styles.portalDescription}>
-                Real-time patrol tracking, incident alerts, status
-                updates & direct resident communication.
-              </Text>
-            </View>
-
-            <Ionicons
-              name="arrow-forward"
-              size={18}
-              color="#555555"
-              style={styles.portalArrow}
-            />
-          </TouchableOpacity>
-
-          <View style={styles.signupPrompt}>
-            <Text style={styles.signupPromptText}>
-              Bagong Residente sa Barangay?
-            </Text>
-
-            <TouchableOpacity onPress={() => setScreen("signup")}>
-              <Text style={styles.signupLink}> Mag-Sign Up Dito</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    );
-  }
-
-  if (screen === "residentLogin") {
-    return (
-      <LoginScreen
-        role="Resident"
-        icon="home"
-        onBack={goBack}
-        onSignup={() => setScreen("signup")}
-      />
-    );
-  }
-
-  if (screen === "tanodLogin") {
-    return (
-      <LoginScreen
-        role="Tanod & Officer"
-        icon="shield-checkmark"
-        onBack={goBack}
-        onSignup={() => setScreen("roles")}
-      />
-    );
-  }
-
-  return <SignupScreen onBack={goBack} />;
-}
-
-function LoginScreen({
-  role,
-  icon,
-  onBack,
-  onSignup,
-}: {
-  role: string;
-  icon: keyof typeof Ionicons.glyphMap;
-  onBack: () => void;
-  onSignup: () => void;
-}) {
+  // =========================
+  // ROLE SELECTION
+  // =========================
   return (
     <SafeAreaView style={styles.safeAreaWhite}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      <ScrollView
+        contentContainerStyle={styles.rolesContainer}
+        showsVerticalScrollIndicator={false}
       >
-        <ScrollView
-          contentContainerStyle={styles.formContainer}
-          keyboardShouldPersistTaps="handled"
+        {/* BACK BUTTON */}
+        <TouchableOpacity
+          onPress={() => setScreen("landing")}
+          style={styles.backButton}
+          activeOpacity={0.7}
         >
-          <TouchableOpacity onPress={onBack} style={styles.formBackButton}>
-            <Ionicons name="arrow-back" size={23} color="#222222" />
-          </TouchableOpacity>
+          <Ionicons
+            name="arrow-back"
+            size={22}
+            color="#222222"
+          />
+        </TouchableOpacity>
 
-          <View style={styles.formLogo}>
-            <Ionicons name="location" size={43} color="#FFFFFF" />
+        {/* LOGO */}
+        <View style={styles.rolesHeader}>
+          <View style={styles.smallLogo}>
+            <Ionicons
+              name="location"
+              size={34}
+              color="#FFFFFF"
+            />
           </View>
 
-          <Text style={styles.formTitle}>RondaWatch</Text>
+          <Text style={styles.rolesTitle}>
+            RondaWatch
+          </Text>
 
-          <Text style={styles.formSubtitle}>
+          <Text style={styles.rolesSubtitle}>
             Sa Bawat Ronda, Ligtas ang Kapitbahayan.
           </Text>
+        </View>
 
-          <View style={styles.roleIndicator}>
-            <Ionicons name={icon} size={19} color="#4B45A9" />
-            <Text style={styles.roleIndicatorText}>{role} Login</Text>
+        {/* IDENTITY HEADER */}
+        <View style={styles.identityHeader}>
+          <View>
+            <Text style={styles.identityTitle}>
+              PUMILI NG
+            </Text>
+
+            <Text style={styles.identityTitle}>
+              PAGKAKAKILANLAN
+            </Text>
+
+            <Text style={styles.identityDescription}>
+              Select Portal Account Role
+            </Text>
           </View>
 
-          <Text style={styles.inputLabel}>Mobile Number / Barangay ID</Text>
-
-          <View style={styles.inputWrapper}>
+          <View style={styles.securityBadge}>
             <Ionicons
-              name="person-outline"
-              size={20}
-              color="#777777"
+              name="shield-checkmark-outline"
+              size={19}
+              color="#666666"
             />
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your mobile number or ID"
-              placeholderTextColor="#999999"
-            />
-          </View>
 
-          <Text style={styles.inputLabel}>Password</Text>
-
-          <View style={styles.inputWrapper}>
-            <Ionicons
-              name="lock-closed-outline"
-              size={20}
-              color="#777777"
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your password"
-              placeholderTextColor="#999999"
-              secureTextEntry
-            />
-            <Ionicons
-              name="eye-outline"
-              size={20}
-              color="#777777"
-            />
-          </View>
-
-          <TouchableOpacity style={styles.forgotButton}>
-            <Text style={styles.forgotText}>Forgot Password?</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.loginButton}>
-            <Text style={styles.loginButtonText}>LOGIN</Text>
-          </TouchableOpacity>
-
-          {role === "Resident" && (
-            <View style={styles.bottomSignup}>
-              <Text style={styles.bottomSignupText}>
-                Don't have an account?
+            <View>
+              <Text style={styles.securityTop}>
+                2-Factor
               </Text>
 
-              <TouchableOpacity onPress={onSignup}>
-                <Text style={styles.bottomSignupLink}> Sign Up</Text>
-              </TouchableOpacity>
+              <Text style={styles.securityBottom}>
+                Authentication
+              </Text>
             </View>
-          )}
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
-  );
-}
+          </View>
+        </View>
 
-function SignupScreen({ onBack }: { onBack: () => void }) {
-  return (
-    <SafeAreaView style={styles.safeAreaWhite}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
-        <ScrollView
-          contentContainerStyle={styles.formContainer}
-          keyboardShouldPersistTaps="handled"
+        {/* =========================
+            RESIDENT PORTAL
+           ========================= */}
+        <TouchableOpacity
+          style={styles.portalCard}
+          activeOpacity={0.7}
+          onPress={() => {
+            router.push("/auth/resident-login");
+          }}
         >
-          <TouchableOpacity onPress={onBack} style={styles.formBackButton}>
-            <Ionicons name="arrow-back" size={23} color="#222222" />
-          </TouchableOpacity>
-
-          <View style={styles.formLogo}>
-            <Ionicons name="location" size={43} color="#FFFFFF" />
+          <View style={styles.portalIconResident}>
+            <Ionicons
+              name="home"
+              size={27}
+              color="#4B63D8"
+            />
           </View>
 
-          <Text style={styles.formTitle}>Create Account</Text>
+          <View style={styles.portalContent}>
+            <View style={styles.portalTitleRow}>
+              <Text style={styles.portalTitle}>
+                Resident Portal
+              </Text>
 
-          <Text style={styles.formSubtitle}>
-            Join your barangay safety network.
+              <View style={styles.residentTag}>
+                <Text style={styles.residentTagText}>
+                  Resident
+                </Text>
+              </View>
+            </View>
+
+            <Text style={styles.portalDescription}>
+              Real-time neighborhood incident reporting,
+              safety updates, and direct patrol coordination.
+            </Text>
+          </View>
+
+          <Ionicons
+            name="arrow-forward"
+            size={18}
+            color="#555555"
+          />
+        </TouchableOpacity>
+
+        {/* =========================
+            TANOD & OFFICER DUTY
+           ========================= */}
+        <TouchableOpacity
+          style={styles.portalCard}
+          activeOpacity={0.7}
+          onPress={() => {
+            router.push("/auth/tanod-login");
+          }}
+        >
+          <View style={styles.portalIconTanod}>
+            <Ionicons
+              name="shield-checkmark"
+              size={27}
+              color="#E7B72C"
+            />
+          </View>
+
+          <View style={styles.portalContent}>
+            <View style={styles.portalTitleRow}>
+              <Text style={styles.portalTitle}>
+                Tanod & Officer Duty
+              </Text>
+
+              <View style={styles.tanodTag}>
+                <Text style={styles.tanodTagText}>
+                  Dispatch
+                </Text>
+              </View>
+            </View>
+
+            <Text style={styles.portalDescription}>
+              Real-time patrol tracking, incident alerts,
+              status updates & direct resident communication.
+            </Text>
+          </View>
+
+          <Ionicons
+            name="arrow-forward"
+            size={18}
+            color="#555555"
+          />
+        </TouchableOpacity>
+
+        {/* RESIDENT SIGN UP */}
+        <View style={styles.signupPrompt}>
+          <Text style={styles.signupPromptText}>
+            Bagong Residente sa Barangay?
           </Text>
 
-          <View style={styles.signupNotice}>
-            <Ionicons
-              name="home-outline"
-              size={22}
-              color="#4B45A9"
-            />
-
-            <View style={{ flex: 1 }}>
-              <Text style={styles.signupNoticeTitle}>
-                Resident Registration
-              </Text>
-
-              <Text style={styles.signupNoticeText}>
-                Register your account to report hazards and receive
-                barangay safety updates.
-              </Text>
-            </View>
-          </View>
-
-          <Text style={styles.inputLabel}>Full Name</Text>
-
-          <View style={styles.inputWrapper}>
-            <Ionicons
-              name="person-outline"
-              size={20}
-              color="#777777"
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your full name"
-              placeholderTextColor="#999999"
-            />
-          </View>
-
-          <Text style={styles.inputLabel}>Mobile Number</Text>
-
-          <View style={styles.inputWrapper}>
-            <Ionicons
-              name="call-outline"
-              size={20}
-              color="#777777"
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder="09XX XXX XXXX"
-              placeholderTextColor="#999999"
-              keyboardType="phone-pad"
-            />
-          </View>
-
-          <Text style={styles.inputLabel}>Barangay ID</Text>
-
-          <View style={styles.inputWrapper}>
-            <Ionicons
-              name="card-outline"
-              size={20}
-              color="#777777"
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your Barangay ID"
-              placeholderTextColor="#999999"
-            />
-          </View>
-
-          <Text style={styles.inputLabel}>Password</Text>
-
-          <View style={styles.inputWrapper}>
-            <Ionicons
-              name="lock-closed-outline"
-              size={20}
-              color="#777777"
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder="Create a password"
-              placeholderTextColor="#999999"
-              secureTextEntry
-            />
-          </View>
-
-          <TouchableOpacity style={styles.loginButton}>
-            <Text style={styles.loginButtonText}>CREATE ACCOUNT</Text>
+          <TouchableOpacity
+            onPress={() =>
+              router.push("/auth/resident-register")
+            }
+            activeOpacity={0.7}
+          >
+            <Text style={styles.signupLink}>
+              {" "}Mag-Sign Up Dito
+            </Text>
           </TouchableOpacity>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  // =========================
+  // GENERAL
+  // =========================
+
   safeArea: {
     flex: 1,
     backgroundColor: "#7774B3",
@@ -479,6 +296,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
   },
+
+  // =========================
+  // LANDING PAGE
+  // =========================
 
   landingContainer: {
     flex: 1,
@@ -504,16 +325,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 1,
-    position: "relative",
-  },
-
-  shieldSide: {
-    position: "absolute",
-    left: 0,
-    bottom: 0,
-    width: 29,
-    height: 48,
-    backgroundColor: "rgba(40, 35, 150, 0.35)",
   },
 
   landingTitle: {
@@ -585,6 +396,10 @@ const styles = StyleSheet.create({
     fontSize: 9,
   },
 
+  // =========================
+  // ROLE SELECTION
+  // =========================
+
   rolesContainer: {
     paddingHorizontal: 18,
     paddingTop: 25,
@@ -597,11 +412,13 @@ const styles = StyleSheet.create({
 
   backButton: {
     position: "absolute",
-    left: 0,
-    top: 0,
+    left: 18,
+    top: 25,
     width: 40,
     height: 40,
     justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
   },
 
   smallLogo: {
@@ -625,6 +442,10 @@ const styles = StyleSheet.create({
     color: "#555555",
     marginTop: 5,
   },
+
+  // =========================
+  // IDENTITY HEADER
+  // =========================
 
   identityHeader: {
     flexDirection: "row",
@@ -666,6 +487,10 @@ const styles = StyleSheet.create({
     fontSize: 6,
     color: "#777777",
   },
+
+  // =========================
+  // PORTAL CARDS
+  // =========================
 
   portalCard: {
     minHeight: 95,
@@ -748,14 +573,14 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
 
-  portalArrow: {
-    alignSelf: "flex-end",
-    marginBottom: 2,
-  },
+  // =========================
+  // SIGN UP
+  // =========================
 
   signupPrompt: {
     flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
     marginTop: 17,
   },
 
@@ -769,151 +594,5 @@ const styles = StyleSheet.create({
     fontSize: 7,
     color: "#35358D",
     fontWeight: "800",
-  },
-
-  formContainer: {
-    flexGrow: 1,
-    paddingHorizontal: 25,
-    paddingTop: 28,
-    paddingBottom: 40,
-  },
-
-  formBackButton: {
-    width: 42,
-    height: 42,
-    justifyContent: "center",
-  },
-
-  formLogo: {
-    alignSelf: "center",
-    width: 68,
-    height: 72,
-    borderRadius: 12,
-    backgroundColor: "#5A51E8",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 5,
-  },
-
-  formTitle: {
-    textAlign: "center",
-    fontSize: 25,
-    fontWeight: "800",
-    color: "#202020",
-    marginTop: 9,
-  },
-
-  formSubtitle: {
-    textAlign: "center",
-    color: "#777777",
-    fontSize: 10,
-    marginTop: 5,
-  },
-
-  roleIndicator: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 7,
-    marginTop: 28,
-    marginBottom: 25,
-  },
-
-  roleIndicatorText: {
-    color: "#4B45A9",
-    fontWeight: "800",
-    fontSize: 13,
-  },
-
-  inputLabel: {
-    fontSize: 10,
-    color: "#333333",
-    fontWeight: "700",
-    marginBottom: 7,
-    marginTop: 13,
-  },
-
-  inputWrapper: {
-    height: 48,
-    borderWidth: 1,
-    borderColor: "#D6D6D6",
-    borderRadius: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 13,
-    backgroundColor: "#FAFAFA",
-  },
-
-  input: {
-    flex: 1,
-    marginLeft: 9,
-    fontSize: 12,
-    color: "#222222",
-  },
-
-  forgotButton: {
-    alignSelf: "flex-end",
-    marginTop: 10,
-  },
-
-  forgotText: {
-    color: "#4B45A9",
-    fontSize: 9,
-    fontWeight: "700",
-  },
-
-  loginButton: {
-    height: 48,
-    backgroundColor: "#35358D",
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 25,
-  },
-
-  loginButtonText: {
-    color: "#FFFFFF",
-    fontWeight: "800",
-    fontSize: 12,
-  },
-
-  bottomSignup: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 22,
-  },
-
-  bottomSignupText: {
-    color: "#666666",
-    fontSize: 10,
-  },
-
-  bottomSignupLink: {
-    color: "#35358D",
-    fontSize: 10,
-    fontWeight: "800",
-  },
-
-  signupNotice: {
-    flexDirection: "row",
-    gap: 12,
-    backgroundColor: "#F0F0FF",
-    borderRadius: 9,
-    padding: 13,
-    marginTop: 30,
-    alignItems: "center",
-  },
-
-  signupNoticeTitle: {
-    fontSize: 11,
-    fontWeight: "800",
-    color: "#333333",
-  },
-
-  signupNoticeText: {
-    fontSize: 8,
-    color: "#666666",
-    lineHeight: 12,
-    marginTop: 3,
   },
 });
