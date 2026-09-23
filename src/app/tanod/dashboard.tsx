@@ -1,13 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { useState } from "react";
 import {
-    Alert,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function TanodDashboard() {
@@ -26,6 +27,7 @@ export default function TanodDashboard() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* HEADER */}
       <View style={styles.header}>
         <View>
           <Text style={styles.smallText}>
@@ -37,7 +39,11 @@ export default function TanodDashboard() {
           </Text>
         </View>
 
-        <TouchableOpacity style={styles.profileButton}>
+        {/* PROFILE → SETTINGS */}
+        <TouchableOpacity
+          style={styles.profileButton}
+          onPress={() => router.push("/tanod/settings")}
+        >
           <Ionicons
             name="person"
             size={22}
@@ -50,6 +56,7 @@ export default function TanodDashboard() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scroll}
       >
+        {/* DUTY STATUS */}
         <View style={styles.dutyCard}>
           <View style={styles.dutyHeader}>
             <View>
@@ -103,7 +110,11 @@ export default function TanodDashboard() {
             onPress={toggleDuty}
           >
             <Ionicons
-              name={onDuty ? "log-out-outline" : "log-in-outline"}
+              name={
+                onDuty
+                  ? "log-out-outline"
+                  : "log-in-outline"
+              }
               size={20}
               color="#FFFFFF"
             />
@@ -114,11 +125,16 @@ export default function TanodDashboard() {
           </TouchableOpacity>
         </View>
 
+        {/* TODAY'S ASSIGNMENT */}
         <Text style={styles.sectionTitle}>
           Today's Assignment
         </Text>
 
-        <View style={styles.assignmentCard}>
+        <TouchableOpacity
+          style={styles.assignmentCard}
+          onPress={() => router.push("/tanod/patrol")}
+          activeOpacity={0.8}
+        >
           <View style={styles.assignmentIcon}>
             <Ionicons
               name="navigate"
@@ -154,14 +170,20 @@ export default function TanodDashboard() {
               ASSIGNED
             </Text>
           </View>
-        </View>
+        </TouchableOpacity>
 
+        {/* QUICK ACTIONS */}
         <Text style={styles.sectionTitle}>
           Quick Actions
         </Text>
 
         <View style={styles.grid}>
-          <TouchableOpacity style={styles.quickCard}>
+          {/* PATROL */}
+          <TouchableOpacity
+            style={styles.quickCard}
+            onPress={() => router.push("/tanod/patrol")}
+            activeOpacity={0.8}
+          >
             <View style={styles.quickIcon}>
               <Ionicons
                 name="map-outline"
@@ -179,7 +201,12 @@ export default function TanodDashboard() {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.quickCard}>
+          {/* SOS / INCIDENTS */}
+          <TouchableOpacity
+            style={styles.quickCard}
+            onPress={() => router.push("/tanod/sos")}
+            activeOpacity={0.8}
+          >
             <View style={styles.quickIconOrange}>
               <Ionicons
                 name="warning-outline"
@@ -197,11 +224,18 @@ export default function TanodDashboard() {
             </Text>
 
             <View style={styles.countBadge}>
-              <Text style={styles.countText}>3</Text>
+              <Text style={styles.countText}>
+                3
+              </Text>
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.quickCard}>
+          {/* CHECK IN */}
+          <TouchableOpacity
+            style={styles.quickCard}
+            onPress={() => router.push("/tanod/patrol")}
+            activeOpacity={0.8}
+          >
             <View style={styles.quickIconGreen}>
               <Ionicons
                 name="checkmark-circle-outline"
@@ -219,7 +253,17 @@ export default function TanodDashboard() {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.quickCard}>
+          {/* DISPATCH */}
+          <TouchableOpacity
+            style={styles.quickCard}
+            onPress={() =>
+              Alert.alert(
+                "Dispatch",
+                "Dispatch communication will be available here."
+              )
+            }
+            activeOpacity={0.8}
+          >
             <View style={styles.quickIconPurple}>
               <Ionicons
                 name="chatbubbles-outline"
@@ -238,10 +282,12 @@ export default function TanodDashboard() {
           </TouchableOpacity>
         </View>
 
+        {/* ACTIVE INCIDENTS */}
         <Text style={styles.sectionTitle}>
           Active Incidents
         </Text>
 
+        {/* ROAD HAZARD */}
         <View style={styles.incidentCard}>
           <View style={styles.incidentIconRed}>
             <Ionicons
@@ -267,14 +313,22 @@ export default function TanodDashboard() {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.respondButton}>
+          <TouchableOpacity
+            style={styles.respondButton}
+            onPress={() => router.push("/tanod/sos")}
+          >
             <Text style={styles.respondText}>
               RESPOND
             </Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.incidentCard}>
+        {/* NOISE COMPLAINT */}
+        <TouchableOpacity
+          style={styles.incidentCard}
+          onPress={() => router.push("/tanod/sos")}
+          activeOpacity={0.8}
+        >
           <View style={styles.incidentIconOrange}>
             <Ionicons
               name="alert-circle"
@@ -304,9 +358,14 @@ export default function TanodDashboard() {
             size={20}
             color="#AAA"
           />
-        </View>
+        </TouchableOpacity>
 
-        <View style={styles.incidentCard}>
+        {/* FLOODING */}
+        <TouchableOpacity
+          style={styles.incidentCard}
+          onPress={() => router.push("/tanod/sos")}
+          activeOpacity={0.8}
+        >
           <View style={styles.incidentIconBlue}>
             <Ionicons
               name="water-outline"
@@ -336,49 +395,70 @@ export default function TanodDashboard() {
             size={20}
             color="#AAA"
           />
-        </View>
+        </TouchableOpacity>
       </ScrollView>
 
+      {/* BOTTOM NAVIGATION */}
       <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem}>
+        {/* HOME */}
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/tanod/dashboard")}
+        >
           <Ionicons
             name="home"
             size={23}
             color="#5A51E8"
           />
+
           <Text style={styles.activeNavText}>
             Home
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItem}>
+        {/* PATROL */}
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/tanod/patrol")}
+        >
           <Ionicons
             name="map-outline"
             size={23}
             color="#999"
           />
+
           <Text style={styles.navText}>
             Patrol
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItem}>
+        {/* INCIDENTS / SOS */}
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/tanod/sos")}
+        >
           <Ionicons
             name="warning-outline"
             size={23}
             color="#999"
           />
+
           <Text style={styles.navText}>
             Incidents
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItem}>
+        {/* PROFILE / SETTINGS */}
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/tanod/settings")}
+        >
           <Ionicons
             name="person-outline"
             size={23}
             color="#999"
           />
+
           <Text style={styles.navText}>
             Profile
           </Text>
@@ -393,6 +473,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F8F8FC",
   },
+
   header: {
     backgroundColor: "#FFFFFF",
     paddingHorizontal: 22,
@@ -402,16 +483,19 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
+
   smallText: {
     fontSize: 12,
     color: "#888",
   },
+
   title: {
     fontSize: 21,
     fontWeight: "800",
     color: "#35358D",
     marginTop: 2,
   },
+
   profileButton: {
     width: 43,
     height: 43,
@@ -420,41 +504,49 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
   scroll: {
     padding: 18,
     paddingBottom: 100,
   },
+
   dutyCard: {
     backgroundColor: "#FFFFFF",
     borderRadius: 18,
     padding: 17,
     elevation: 2,
   },
+
   dutyHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
+
   dutyTitle: {
     fontSize: 17,
     fontWeight: "800",
     color: "#35358D",
   },
+
   dutyStatusRow: {
     flexDirection: "row",
     alignItems: "center",
     marginTop: 8,
   },
+
   statusDot: {
     width: 9,
     height: 9,
     borderRadius: 5,
   },
+
   dutyStatus: {
     fontSize: 12,
     fontWeight: "800",
     marginLeft: 7,
   },
+
   dutyButton: {
     height: 48,
     borderRadius: 12,
@@ -463,12 +555,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
   },
+
   dutyButtonText: {
     color: "#FFFFFF",
     fontWeight: "800",
     fontSize: 14,
     marginLeft: 8,
   },
+
   sectionTitle: {
     fontSize: 17,
     fontWeight: "800",
@@ -476,6 +570,7 @@ const styles = StyleSheet.create({
     marginTop: 22,
     marginBottom: 11,
   },
+
   assignmentCard: {
     backgroundColor: "#FFFFFF",
     borderRadius: 17,
@@ -484,6 +579,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     elevation: 2,
   },
+
   assignmentIcon: {
     width: 50,
     height: 50,
@@ -492,46 +588,55 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
   assignmentContent: {
     flex: 1,
     marginLeft: 12,
   },
+
   assignmentTitle: {
     fontSize: 14,
     fontWeight: "800",
     color: "#333",
   },
+
   assignmentText: {
     fontSize: 11,
     color: "#777",
     marginTop: 4,
   },
+
   timeRow: {
     flexDirection: "row",
     alignItems: "center",
     marginTop: 5,
   },
+
   timeText: {
     fontSize: 10,
     color: "#777",
     marginLeft: 4,
   },
+
   assignedBadge: {
     backgroundColor: "#E9E7FF",
     paddingHorizontal: 7,
     paddingVertical: 5,
     borderRadius: 8,
   },
+
   assignedText: {
     fontSize: 8,
     color: "#5A51E8",
     fontWeight: "800",
   },
+
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 12,
   },
+
   quickCard: {
     width: "47.5%",
     backgroundColor: "#FFFFFF",
@@ -540,6 +645,7 @@ const styles = StyleSheet.create({
     elevation: 2,
     position: "relative",
   },
+
   quickIcon: {
     width: 48,
     height: 48,
@@ -548,6 +654,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
   quickIconOrange: {
     width: 48,
     height: 48,
@@ -556,6 +663,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
   quickIconGreen: {
     width: 48,
     height: 48,
@@ -564,6 +672,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
   quickIconPurple: {
     width: 48,
     height: 48,
@@ -572,18 +681,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
   quickTitle: {
     fontSize: 13,
     fontWeight: "800",
     color: "#35358D",
     marginTop: 10,
   },
+
   quickText: {
     fontSize: 10,
     color: "#888",
     marginTop: 4,
     lineHeight: 15,
   },
+
   countBadge: {
     position: "absolute",
     right: 12,
@@ -595,11 +707,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
   countText: {
     color: "#FFFFFF",
     fontSize: 10,
     fontWeight: "800",
   },
+
   incidentCard: {
     backgroundColor: "#FFFFFF",
     borderRadius: 15,
@@ -608,6 +722,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
   },
+
   incidentIconRed: {
     width: 43,
     height: 43,
@@ -616,6 +731,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
   incidentIconOrange: {
     width: 43,
     height: 43,
@@ -624,6 +740,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
   incidentIconBlue: {
     width: 43,
     height: 43,
@@ -632,20 +749,24 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
   incidentContent: {
     flex: 1,
     marginLeft: 11,
   },
+
   incidentTitle: {
     color: "#333",
     fontWeight: "800",
     fontSize: 13,
   },
+
   incidentLocation: {
     color: "#999",
     fontSize: 10,
     marginTop: 3,
   },
+
   priorityBadge: {
     alignSelf: "flex-start",
     backgroundColor: "#FFE5E5",
@@ -654,11 +775,13 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     marginTop: 5,
   },
+
   priorityText: {
     color: "#D94343",
     fontSize: 8,
     fontWeight: "800",
   },
+
   progressBadge: {
     alignSelf: "flex-start",
     backgroundColor: "#FFF2D9",
@@ -667,11 +790,13 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     marginTop: 5,
   },
+
   progressText: {
     color: "#C98A14",
     fontSize: 8,
     fontWeight: "800",
   },
+
   ackBadge: {
     alignSelf: "flex-start",
     backgroundColor: "#F0EFFF",
@@ -680,22 +805,26 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     marginTop: 5,
   },
+
   ackText: {
     color: "#5A51E8",
     fontSize: 8,
     fontWeight: "800",
   },
+
   respondButton: {
     backgroundColor: "#5A51E8",
     paddingHorizontal: 9,
     paddingVertical: 8,
     borderRadius: 8,
   },
+
   respondText: {
     color: "#FFFFFF",
     fontSize: 8,
     fontWeight: "800",
   },
+
   bottomNav: {
     position: "absolute",
     bottom: 0,
@@ -709,16 +838,19 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center",
   },
+
   navItem: {
     alignItems: "center",
     justifyContent: "center",
   },
+
   activeNavText: {
     color: "#5A51E8",
     fontSize: 10,
     fontWeight: "800",
     marginTop: 3,
   },
+
   navText: {
     color: "#999",
     fontSize: 10,
