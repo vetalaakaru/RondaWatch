@@ -8,8 +8,12 @@
     "scheme": "rondawatch",
     "userInterfaceStyle": "automatic",
     "ios": {
+<<<<<<< HEAD
       "icon": "./assets/expo.icon",
       "bundleIdentifier": "com.anonymous.RondaWatch"
+=======
+      "icon": "./assets/expo.icon"
+>>>>>>> 02828341879a7fe47ed7a439b8d635eb84191d05
     },
     "android": {
       "adaptiveIcon": {
@@ -18,8 +22,12 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
+<<<<<<< HEAD
       "predictiveBackGestureEnabled": false,
       "package": "com.anonymous.RondaWatch"
+=======
+      "predictiveBackGestureEnabled": false
+>>>>>>> 02828341879a7fe47ed7a439b8d635eb84191d05
     },
     "web": {
       "output": "static",
@@ -34,18 +42,25 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
+<<<<<<< HEAD
       ],
       "expo-sqlite"
+=======
+      ]
+>>>>>>> 02828341879a7fe47ed7a439b8d635eb84191d05
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+<<<<<<< HEAD
     },
     "extra": {
       "router": {},
       "eas": {
         "projectId": "a5222236-1a27-49c1-9153-4061f31eb08f"
       }
+=======
+>>>>>>> 02828341879a7fe47ed7a439b8d635eb84191d05
     }
   }
 }
