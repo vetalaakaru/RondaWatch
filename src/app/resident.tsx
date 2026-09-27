@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -9,7 +10,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { router } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 
 type Announcement = {
@@ -281,9 +281,12 @@ export default function ResidentDashboard() {
             )}
           </View>
 
-          <Text style={styles.shield}>
-            🛡️
-          </Text>
+          {/* Shield icon wrapped with TouchableOpacity to navigate to resident-profile */}
+          <TouchableOpacity onPress={() => router.push('/resident-profile')}>
+            <Text style={styles.shield}>
+              🛡️
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
 
