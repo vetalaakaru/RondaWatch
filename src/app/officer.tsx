@@ -144,9 +144,6 @@ export default function OfficerDashboard() {
               );
               return;
             }
-
-            router.dismissAll();
-            router.replace('/login');
           },
         },
       ]

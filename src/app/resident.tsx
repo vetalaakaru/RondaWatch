@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -29,9 +29,12 @@ type Notification = {
 };
 
 export default function ResidentDashboard() {
+  const scrollViewRef = useRef<ScrollView>(null);
+
   const [name, setName] = useState('Resident');
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notificationY, setNotificationY] = useState(0);
   const [loadingAnnouncements, setLoadingAnnouncements] =
     useState(true);
   const [loadingNotifications, setLoadingNotifications] =
@@ -131,6 +134,7 @@ export default function ResidentDashboard() {
         'Notifications Error:',
         error.message
       );
+      setLoadingNotifications(false);
       return;
     }
 
@@ -244,12 +248,20 @@ export default function ResidentDashboard() {
     return '🔔';
   }
 
+  function openNotifications() {
+    scrollViewRef.current?.scrollTo({
+      y: Math.max(notificationY - 20, 0),
+      animated: true,
+    });
+  }
+
   const unreadCount = notifications.filter(
     (notification) => !notification.is_read
   ).length;
 
   return (
     <ScrollView
+      ref={scrollViewRef}
       style={styles.container}
       showsVerticalScrollIndicator={false}
     >
@@ -265,7 +277,11 @@ export default function ResidentDashboard() {
         </View>
 
         <View style={styles.headerRight}>
-          <View style={styles.notificationIcon}>
+          <TouchableOpacity
+            style={styles.notificationIcon}
+            onPress={openNotifications}
+            activeOpacity={0.7}
+          >
             <Text style={styles.bell}>
               🔔
             </Text>
@@ -279,11 +295,18 @@ export default function ResidentDashboard() {
                 </Text>
               </View>
             )}
-          </View>
+          </TouchableOpacity>
 
-          <Text style={styles.shield}>
-            🛡️
-          </Text>
+          <TouchableOpacity
+            onPress={() =>
+              router.push('/resident-profile')
+            }
+            activeOpacity={0.7}
+          >
+            <Text style={styles.shield}>
+              🛡️
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -367,7 +390,14 @@ export default function ResidentDashboard() {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.sectionHeader}>
+      <View
+        style={styles.sectionHeader}
+        onLayout={(event) => {
+          setNotificationY(
+            event.nativeEvent.layout.y
+          );
+        }}
+      >
         <Text style={styles.sectionTitle}>
           Notifications
         </Text>
@@ -422,6 +452,7 @@ export default function ResidentDashboard() {
                 markAsRead(notification.id);
               }
             }}
+            activeOpacity={0.7}
           >
             <View style={styles.notificationIconBox}>
               <Text style={styles.notificationEmoji}>
@@ -551,15 +582,6 @@ export default function ResidentDashboard() {
           </View>
         ))
       )}
-
-      <TouchableOpacity
-        style={styles.logoutButton}
-        onPress={logout}
-      >
-        <Text style={styles.logoutText}>
-          Logout
-        </Text>
-      </TouchableOpacity>
 
       <View style={styles.bottomSpace} />
     </ScrollView>
