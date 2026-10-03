@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { Stack } from 'expo-router';
 
 export default function RootLayout() {
@@ -8,7 +7,6 @@ export default function RootLayout() {
         headerShown: false,
       }}
     />
-=======
 import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useColorScheme } from 'react-native';
@@ -25,6 +23,5 @@ export default function TabLayout() {
       <AnimatedSplashOverlay />
       <AppTabs />
     </ThemeProvider>
->>>>>>> 02828341879a7fe47ed7a439b8d635eb84191d05
   );
 }

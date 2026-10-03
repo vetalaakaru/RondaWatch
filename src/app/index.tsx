@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { router } from 'expo-router';
 
@@ -35,7 +34,6 @@ export default function Index() {
       </TouchableOpacity>
 
     </View>
-=======
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
@@ -504,12 +502,10 @@ function SignupScreen({ onBack }: { onBack: () => void }) {
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
->>>>>>> 02828341879a7fe47ed7a439b8d635eb84191d05
   );
 }
 
 const styles = StyleSheet.create({
-<<<<<<< HEAD
   container: {
     flex: 1,
     backgroundColor: '#7777B8',
@@ -574,7 +570,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-=======
   safeArea: {
     flex: 1,
     backgroundColor: "#7774B3",
@@ -1022,4 +1017,3 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
 });
->>>>>>> 02828341879a7fe47ed7a439b8d635eb84191d05
