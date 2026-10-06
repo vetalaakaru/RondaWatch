@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -13,8 +13,14 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import * as FileSystem from 'expo-file-system/legacy';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { supabase } from '../../lib/supabase';
+import {
+  createIncidentDraft,
+  deleteIncidentDraft,
+  getIncidentDraft,
+  updateIncidentDraft,
+} from '../../lib/offlineDrafts';
 
 const incidentTypes = [
   'Crime',
@@ -27,10 +33,96 @@ const incidentTypes = [
 ];
 
 export default function Report() {
+  const { draftId } = useLocalSearchParams<{
+    draftId?: string;
+  }>();
+
+  const isEditingDraft = !!draftId;
+
   const [incidentType, setIncidentType] = useState('');
   const [description, setDescription] = useState('');
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
+
   const [loading, setLoading] = useState(false);
+  const [savingDraft, setSavingDraft] = useState(false);
+  const [loadingDraft, setLoadingDraft] = useState(false);
+
+  useEffect(() => {
+    if (!draftId) {
+      return;
+    }
+
+    const loadDraft = async () => {
+      setLoadingDraft(true);
+
+      try {
+        const id = Number(draftId);
+
+        if (!Number.isInteger(id) || id <= 0) {
+          Alert.alert(
+            'Invalid Draft',
+            'The selected draft is invalid.',
+            [
+              {
+                text: 'OK',
+                onPress: () =>
+                  router.replace('/resident-drafts'),
+              },
+            ]
+          );
+
+          return;
+        }
+
+        const draft = await getIncidentDraft(id);
+
+        if (!draft) {
+          Alert.alert(
+            'Draft Not Found',
+            'This draft no longer exists.',
+            [
+              {
+                text: 'OK',
+                onPress: () =>
+                  router.replace('/resident-drafts'),
+              },
+            ]
+          );
+
+          return;
+        }
+
+        setIncidentType(draft.incidentType);
+        setDescription(draft.description);
+        setImageUri(draft.photoUri);
+        setLatitude(draft.latitude);
+        setLongitude(draft.longitude);
+      } catch (error: any) {
+        console.log(
+          'Load draft error:',
+          error?.message || error
+        );
+
+        Alert.alert(
+          'Error',
+          'Unable to load this draft.',
+          [
+            {
+              text: 'OK',
+              onPress: () =>
+                router.replace('/resident-drafts'),
+            },
+          ]
+        );
+      } finally {
+        setLoadingDraft(false);
+      }
+    };
+
+    loadDraft();
+  }, [draftId]);
 
   const pickImage = async () => {
     const permission =
@@ -86,10 +178,6 @@ export default function Report() {
       await Location.requestForegroundPermissionsAsync();
 
     if (permission.status !== 'granted') {
-      Alert.alert(
-        'Location Required',
-        'Please allow location access so the incident location can be recorded.'
-      );
       return null;
     }
 
@@ -104,11 +192,108 @@ export default function Report() {
         longitude: location.coords.longitude,
       };
     } catch {
-      Alert.alert(
-        'Location Error',
-        'Unable to get your current location.'
-      );
       return null;
+    }
+  };
+
+  const saveDraft = async () => {
+    if (!incidentType) {
+      Alert.alert(
+        'Missing Information',
+        'Please select an incident type.'
+      );
+      return;
+    }
+
+    if (!description.trim()) {
+      Alert.alert(
+        'Missing Information',
+        'Please enter an incident description.'
+      );
+      return;
+    }
+
+    setSavingDraft(true);
+
+    try {
+      const location = await getLocation();
+
+      const finalLatitude =
+        location?.latitude ?? latitude ?? null;
+
+      const finalLongitude =
+        location?.longitude ?? longitude ?? null;
+
+      if (isEditingDraft) {
+        const id = Number(draftId);
+
+        if (!Number.isInteger(id) || id <= 0) {
+          throw new Error(
+            'Invalid draft ID.'
+          );
+        }
+
+        await updateIncidentDraft(id, {
+          incidentType,
+          description: description.trim(),
+          photoUri: imageUri,
+          latitude: finalLatitude,
+          longitude: finalLongitude,
+        });
+
+        Alert.alert(
+          'Draft Updated',
+          'Your changes have been saved successfully.',
+          [
+            {
+              text: 'OK',
+              onPress: () =>
+                router.replace('/resident-drafts'),
+            },
+          ]
+        );
+
+        return;
+      }
+
+      await createIncidentDraft({
+        incidentType,
+        description: description.trim(),
+        photoUri: imageUri,
+        latitude: finalLatitude,
+        longitude: finalLongitude,
+      });
+
+      Alert.alert(
+        'Draft Saved',
+        'Your incident report has been saved on this device. You can submit it when you have internet.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              setIncidentType('');
+              setDescription('');
+              setImageUri(null);
+              setLatitude(null);
+              setLongitude(null);
+              router.replace('/resident');
+            },
+          },
+        ]
+      );
+    } catch (error: any) {
+      console.log(
+        'Save draft error:',
+        error?.message || error
+      );
+
+      Alert.alert(
+        'Draft Failed',
+        error?.message ||
+          'Unable to save the incident draft.'
+      );
+    } finally {
+      setSavingDraft(false);
     }
   };
 
@@ -117,12 +302,8 @@ export default function Report() {
     userId: string
   ) => {
     try {
-      console.log('Image URI:', uri);
-
       const fileInfo =
         await FileSystem.getInfoAsync(uri);
-
-      console.log('File info:', fileInfo);
 
       if (!fileInfo.exists) {
         throw new Error(
@@ -142,9 +323,7 @@ export default function Report() {
         );
       }
 
-      // Convert Base64 to Uint8Array
-      const binaryString =
-        atob(base64);
+      const binaryString = atob(base64);
 
       const bytes = new Uint8Array(
         binaryString.length
@@ -162,11 +341,6 @@ export default function Report() {
       const filePath =
         `${userId}/${Date.now()}.jpg`;
 
-      console.log(
-        'Uploading:',
-        filePath
-      );
-
       const {
         error: uploadError,
       } = await supabase.storage
@@ -182,18 +356,8 @@ export default function Report() {
         );
 
       if (uploadError) {
-        console.log(
-          'Upload error:',
-          uploadError.message
-        );
-
         throw uploadError;
       }
-
-      console.log(
-        'Photo uploaded successfully:',
-        filePath
-      );
 
       return filePath;
     } catch (error: any) {
@@ -227,12 +391,9 @@ export default function Report() {
 
     try {
       const {
-        data: {
-          user,
-        },
+        data: { user },
         error: userError,
-      } =
-        await supabase.auth.getUser();
+      } = await supabase.auth.getUser();
 
       if (userError || !user) {
         Alert.alert(
@@ -242,16 +403,28 @@ export default function Report() {
         return;
       }
 
-      const location =
-        await getLocation();
+      let currentLatitude = latitude;
+      let currentLongitude = longitude;
 
-      if (!location) {
+      const location = await getLocation();
+
+      if (location) {
+        currentLatitude = location.latitude;
+        currentLongitude = location.longitude;
+      }
+
+      if (
+        currentLatitude === null ||
+        currentLongitude === null
+      ) {
+        Alert.alert(
+          'Location Required',
+          'Please allow location access so the incident location can be recorded.'
+        );
         return;
       }
 
-      let photoPath:
-        | string
-        | null = null;
+      let photoPath: string | null = null;
 
       if (imageUri) {
         try {
@@ -277,33 +450,21 @@ export default function Report() {
         .from('incidents')
         .insert({
           reporter_id: user.id,
-          incident_type:
-            incidentType,
-          description:
-            description.trim(),
-          photo_url:
-            photoPath,
-          latitude:
-            location.latitude,
-          longitude:
-            location.longitude,
+          incident_type: incidentType,
+          description: description.trim(),
+          photo_url: photoPath,
+          latitude: currentLatitude,
+          longitude: currentLongitude,
           status: 'reported',
         })
         .select()
         .single();
 
       if (error) {
-        console.log(
-          'Incident insert error:',
-          error.message
-        );
-
         if (photoPath) {
           await supabase.storage
             .from('incident-photos')
-            .remove([
-              photoPath,
-            ]);
+            .remove([photoPath]);
         }
 
         Alert.alert(
@@ -319,6 +480,32 @@ export default function Report() {
         data?.id
       );
 
+      if (isEditingDraft && draftId) {
+        const id = Number(draftId);
+
+        if (!Number.isInteger(id) || id <= 0) {
+          Alert.alert(
+            'Draft Error',
+            'The incident was submitted, but the local draft ID is invalid.'
+          );
+          return;
+        }
+
+        try {
+          await deleteIncidentDraft(id);
+        } catch (draftError: any) {
+          console.log(
+            'Delete submitted draft error:',
+            draftError?.message || draftError
+          );
+
+          Alert.alert(
+            'Draft Cleanup Warning',
+            'The incident was submitted successfully, but the local draft could not be deleted.'
+          );
+        }
+      }
+
       Alert.alert(
         'Report Submitted',
         'Your incident report has been submitted successfully.',
@@ -329,10 +516,9 @@ export default function Report() {
               setIncidentType('');
               setDescription('');
               setImageUri(null);
-
-              router.replace(
-                '/resident'
-              );
+              setLatitude(null);
+              setLongitude(null);
+              router.replace('/resident');
             },
           },
         ]
@@ -353,11 +539,34 @@ export default function Report() {
     }
   };
 
+  if (loadingDraft) {
+    return (
+      <View style={styles.loadingScreen}>
+        <ActivityIndicator
+          size="large"
+          color="#30305F"
+        />
+
+        <Text style={styles.loadingText}>
+          Loading draft...
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => {
+            if (isEditingDraft) {
+              router.replace(
+                '/resident-drafts'
+              );
+            } else {
+              router.replace('/resident');
+            }
+          }}
         >
           <Text style={styles.back}>
             ‹ Back
@@ -365,18 +574,16 @@ export default function Report() {
         </TouchableOpacity>
 
         <Text style={styles.title}>
-          Report Incident
+          {isEditingDraft
+            ? 'Edit Draft'
+            : 'Report Incident'}
         </Text>
 
-        <View
-          style={{ width: 50 }}
-        />
+        <View style={{ width: 50 }} />
       </View>
 
       <ScrollView
-        showsVerticalScrollIndicator={
-          false
-        }
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={
           styles.scrollContent
         }
@@ -551,14 +758,60 @@ export default function Report() {
                   styles.locationText
                 }
               >
-                Your current GPS
-                location will be
-                recorded when
-                you submit the
-                report.
+                {latitude !== null &&
+                longitude !== null
+                  ? 'A location is saved with this draft.'
+                  : 'Your GPS location will be recorded when you submit or save the draft.'}
               </Text>
             </View>
           </View>
+
+          <TouchableOpacity
+            style={[
+              styles.draftButton,
+              savingDraft &&
+                styles.submitButtonDisabled,
+            ]}
+            onPress={
+              saveDraft
+            }
+            disabled={
+              savingDraft ||
+              loading
+            }
+          >
+            {savingDraft ? (
+              <>
+                <ActivityIndicator
+                  color="#30305F"
+                  size="small"
+                />
+
+                <Text
+                  style={[
+                    styles.draftText,
+                    {
+                      marginLeft: 10,
+                    },
+                  ]}
+                >
+                  {isEditingDraft
+                    ? 'Updating Draft...'
+                    : 'Saving Draft...'}
+                </Text>
+              </>
+            ) : (
+              <Text
+                style={
+                  styles.draftText
+                }
+              >
+                {isEditingDraft
+                  ? '💾 Update Draft'
+                  : '💾 Save as Draft'}
+              </Text>
+            )}
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={[
@@ -569,7 +822,10 @@ export default function Report() {
             onPress={
               submitReport
             }
-            disabled={loading}
+            disabled={
+              loading ||
+              savingDraft
+            }
           >
             {loading ? (
               <>
@@ -595,8 +851,9 @@ export default function Report() {
                   styles.submitText
                 }
               >
-                Submit Incident
-                Report
+                {isEditingDraft
+                  ? 'Submit Draft'
+                  : 'Submit Incident Report'}
               </Text>
             )}
           </TouchableOpacity>
@@ -612,6 +869,20 @@ const styles = StyleSheet.create({
     backgroundColor:
       '#F7F7FB',
     padding: 20,
+  },
+
+  loadingScreen: {
+    flex: 1,
+    backgroundColor:
+      '#F7F7FB',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  loadingText: {
+    marginTop: 12,
+    color: '#777',
+    fontSize: 14,
   },
 
   header: {
@@ -773,6 +1044,26 @@ const styles = StyleSheet.create({
     color: '#777',
     fontSize: 13,
     lineHeight: 18,
+  },
+
+  draftButton: {
+    backgroundColor:
+      '#F0F0F8',
+    borderWidth: 1,
+    borderColor:
+      '#7777B8',
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    marginBottom: 10,
+  },
+
+  draftText: {
+    color: '#30305F',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 
   submitButton: {

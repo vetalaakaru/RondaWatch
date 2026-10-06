@@ -624,14 +624,14 @@ export default function TanodPatrol() {
 
                   <Text style={styles.coordinate}>
                     Latitude:{' '}
-                    {assignedRoute.patrol_routes.latitude.toFixed(
+                    {assignedRoute.patrol_routes?.latitude?.toFixed(
                       6
                     )}
                   </Text>
 
                   <Text style={styles.coordinate}>
                     Longitude:{' '}
-                    {assignedRoute.patrol_routes.longitude.toFixed(
+                    {assignedRoute.patrol_routes?.longitude?.toFixed(
                       6
                     )}
                   </Text>

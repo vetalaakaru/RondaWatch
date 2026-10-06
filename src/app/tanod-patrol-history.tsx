@@ -55,7 +55,17 @@ export default function TanodPatrolHistory() {
     if (error) {
       Alert.alert('Error', error.message);
     } else {
-      setHistory((data as PatrolHistory[]) || []);
+      setHistory(
+        (data || []).map((item: any) => ({
+          id: item.id,
+          start_time: item.start_time,
+          end_time: item.end_time,
+          status: item.status,
+          patrol_routes: Array.isArray(item.patrol_routes)
+            ? item.patrol_routes[0] || null
+            : item.patrol_routes || null,
+        }))
+      );
     }
 
     setLoading(false);
@@ -100,62 +110,56 @@ export default function TanodPatrolHistory() {
               onRefresh={loadHistory}
             />
           }
+          contentContainerStyle={styles.content}
         >
           {history.length === 0 ? (
-            <View style={styles.emptyCard}>
+            <View style={styles.empty}>
+              <Text style={styles.emptyIcon}>🚓</Text>
               <Text style={styles.emptyTitle}>
                 No Patrol History
               </Text>
-
               <Text style={styles.emptyText}>
-                Completed patrols will appear here.
+                Your completed and active patrol sessions will appear here.
               </Text>
             </View>
           ) : (
-            history.map((patrol) => (
-              <View key={patrol.id} style={styles.card}>
-                <Text style={styles.routeName}>
-                  🚓{' '}
-                  {patrol.patrol_routes?.route_name ||
-                    'Patrol Route'}
-                </Text>
-
-                <Text style={styles.date}>
-                  Date: {formatDate(patrol.start_time)}
-                </Text>
-
-                <View style={styles.row}>
-                  <Text style={styles.label}>
-                    Started:
+            history.map((item) => (
+              <View key={item.id} style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.routeName}>
+                    {item.patrol_routes?.route_name || 'Unknown Route'}
                   </Text>
 
-                  <Text style={styles.value}>
-                    {formatTime(patrol.start_time)}
+                  <Text
+                    style={[
+                      styles.status,
+                      item.status === 'completed'
+                        ? styles.completed
+                        : styles.active,
+                    ]}
+                  >
+                    {item.status?.toUpperCase() || 'UNKNOWN'}
                   </Text>
                 </View>
 
-                <View style={styles.row}>
-                  <Text style={styles.label}>
-                    Ended:
-                  </Text>
-
+                <View style={styles.infoRow}>
+                  <Text style={styles.label}>Date</Text>
                   <Text style={styles.value}>
-                    {formatTime(patrol.end_time)}
+                    {formatDate(item.start_time)}
                   </Text>
                 </View>
 
-                <View
-                  style={[
-                    styles.statusBadge,
-                    patrol.status === 'completed'
-                      ? styles.completed
-                      : styles.active,
-                  ]}
-                >
-                  <Text style={styles.statusText}>
-                    {patrol.status === 'completed'
-                      ? 'COMPLETED'
-                      : 'ACTIVE'}
+                <View style={styles.infoRow}>
+                  <Text style={styles.label}>Started</Text>
+                  <Text style={styles.value}>
+                    {formatTime(item.start_time)}
+                  </Text>
+                </View>
+
+                <View style={styles.infoRow}>
+                  <Text style={styles.label}>Ended</Text>
+                  <Text style={styles.value}>
+                    {formatTime(item.end_time)}
                   </Text>
                 </View>
               </View>
@@ -171,101 +175,101 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F7F7FB',
-    padding: 20,
   },
-
   header: {
-    marginTop: 35,
-    marginBottom: 25,
+    height: 60,
+    backgroundColor: '#7777B8',
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-  },
-
-  back: {
-    color: '#7777B8',
-    fontSize: 17,
-    fontWeight: 'bold',
-    width: 50,
-  },
-
-  title: {
-    fontSize: 23,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 15,
-  },
-
-  routeName: {
-    color: '#30305F',
-    fontSize: 19,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-
-  date: {
-    color: '#777',
-    marginBottom: 15,
-  },
-
-  row: {
-    flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    paddingHorizontal: 16,
   },
-
-  label: {
-    color: '#777',
-  },
-
-  value: {
-    color: '#333',
+  back: {
+    color: '#FFFFFF',
+    fontSize: 17,
     fontWeight: '600',
   },
-
-  statusBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 20,
-    marginTop: 8,
+  title: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: '700',
   },
-
-  completed: {
-    backgroundColor: '#DFF3E7',
+  content: {
+    padding: 16,
+    paddingBottom: 30,
   },
-
-  active: {
-    backgroundColor: '#FFF0C2',
-  },
-
-  statusText: {
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
-
-  emptyCard: {
+  card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 15,
-    padding: 30,
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: '#E4E4EE',
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 16,
+    gap: 10,
+  },
+  routeName: {
+    flex: 1,
+    color: '#33334F',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  status: {
+    fontSize: 11,
+    fontWeight: '800',
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  completed: {
+    color: '#26734D',
+    backgroundColor: '#DDF5E8',
+  },
+  active: {
+    color: '#8A6500',
+    backgroundColor: '#FFF1BF',
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 7,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F5',
+  },
+  label: {
+    color: '#777777',
+    fontSize: 14,
+  },
+  value: {
+    color: '#333333',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  empty: {
     alignItems: 'center',
+    paddingTop: 80,
+    paddingHorizontal: 30,
   },
-
+  emptyIcon: {
+    fontSize: 48,
+    marginBottom: 15,
+  },
   emptyTitle: {
-    color: '#30305F',
-    fontSize: 19,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#33334F',
+    marginBottom: 8,
   },
-
   emptyText: {
-    color: '#888',
-    marginTop: 8,
     textAlign: 'center',
+    color: '#777777',
+    fontSize: 14,
+    lineHeight: 21,
   },
 });
