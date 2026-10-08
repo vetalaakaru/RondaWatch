@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -9,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { router } from 'expo-router';
+import { getIncidentDrafts } from '../../lib/offlineDrafts';
 import { supabase } from '../../lib/supabase';
 
 type Announcement = {
@@ -35,6 +36,7 @@ export default function ResidentDashboard() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [notificationY, setNotificationY] = useState(0);
+  const [draftCount, setDraftCount] = useState(0);
   const [loadingAnnouncements, setLoadingAnnouncements] =
     useState(true);
   const [loadingNotifications, setLoadingNotifications] =
@@ -44,9 +46,11 @@ export default function ResidentDashboard() {
     loadProfile();
     loadAnnouncements();
     loadNotifications();
+    loadDraftCount();
 
     const interval = setInterval(() => {
       loadNotifications();
+      loadDraftCount();
     }, 5000);
 
     const backHandler = BackHandler.addEventListener(
@@ -140,6 +144,18 @@ export default function ResidentDashboard() {
 
     setNotifications(data ?? []);
     setLoadingNotifications(false);
+  }
+
+  async function loadDraftCount() {
+    try {
+      const drafts = await getIncidentDrafts();
+      setDraftCount(drafts.length);
+    } catch (error) {
+      console.log(
+        'DRAFT COUNT ERROR:',
+        error
+      );
+    }
   }
 
   async function markAsRead(id: string) {
@@ -292,6 +308,28 @@ export default function ResidentDashboard() {
                   {unreadCount > 9
                     ? '9+'
                     : unreadCount}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.notificationIcon}
+            onPress={() =>
+              router.push('/resident-drafts')
+            }
+            activeOpacity={0.7}
+          >
+            <Text style={styles.draft}>
+              📃
+            </Text>
+
+            {draftCount > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>
+                  {draftCount > 9
+                    ? '9+'
+                    : draftCount}
                 </Text>
               </View>
             )}
@@ -630,6 +668,10 @@ const styles = StyleSheet.create({
   },
 
   bell: {
+    fontSize: 27,
+  },
+
+  draft: {
     fontSize: 27,
   },
 

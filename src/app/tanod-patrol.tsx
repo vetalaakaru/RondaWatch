@@ -1,3 +1,5 @@
+import * as Location from 'expo-location';
+import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
   Alert,
@@ -8,8 +10,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import * as Location from 'expo-location';
-import { router } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 
 type AssignedRoute = {
@@ -624,14 +624,14 @@ export default function TanodPatrol() {
 
                   <Text style={styles.coordinate}>
                     Latitude:{' '}
-                    {assignedRoute.patrol_routes.latitude.toFixed(
+                    {assignedRoute.patrol_routes?.latitude?.toFixed(
                       6
                     )}
                   </Text>
 
                   <Text style={styles.coordinate}>
                     Longitude:{' '}
-                    {assignedRoute.patrol_routes.longitude.toFixed(
+                    {assignedRoute.patrol_routes?.longitude?.toFixed(
                       6
                     )}
                   </Text>
