@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 
@@ -29,32 +30,36 @@ export default function TanodPatrolHistory() {
   const loadHistory = async () => {
     setLoading(true);
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    try {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
 
-    if (!user) {
-      setLoading(false);
-      return;
-    }
+      if (userError || !user) {
+        Alert.alert('Login Required', 'Please log in again.');
+        return;
+      }
 
-    const { data, error } = await supabase
-      .from('patrol_sessions')
-      .select(`
-        id,
-        start_time,
-        end_time,
-        status,
-        patrol_routes (
-          route_name
-        )
-      `)
-      .eq('tanod_id', user.id)
-      .order('start_time', { ascending: false });
+      const { data, error } = await supabase
+        .from('patrol_sessions')
+        .select(`
+          id,
+          start_time,
+          end_time,
+          status,
+          patrol_routes (
+            route_name
+          )
+        `)
+        .eq('tanod_id', user.id)
+        .order('start_time', { ascending: false });
 
-    if (error) {
-      Alert.alert('Error', error.message);
-    } else {
+      if (error) {
+        Alert.alert('Error', error.message);
+        return;
+      }
+
       setHistory(
         (data || []).map((item: any) => ({
           id: item.id,
@@ -66,9 +71,14 @@ export default function TanodPatrolHistory() {
             : item.patrol_routes || null,
         }))
       );
+    } catch (error: any) {
+      Alert.alert(
+        'Error',
+        error?.message || 'Unable to load patrol history.'
+      );
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -89,25 +99,38 @@ export default function TanodPatrolHistory() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+        >
           <Text style={styles.back}>‹ Back</Text>
         </TouchableOpacity>
 
         <Text style={styles.title}>Patrol History</Text>
 
-        <View style={{ width: 50 }} />
+        <View style={styles.headerSpacer} />
       </View>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#7777B8" />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#7777B8" />
+          <Text style={styles.loadingText}>
+            Loading patrol history...
+          </Text>
+        </View>
       ) : (
         <ScrollView
+          showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
               refreshing={loading}
               onRefresh={loadHistory}
+              colors={['#7777B8']}
             />
           }
           contentContainerStyle={styles.content}
@@ -115,9 +138,11 @@ export default function TanodPatrolHistory() {
           {history.length === 0 ? (
             <View style={styles.empty}>
               <Text style={styles.emptyIcon}>🚓</Text>
+
               <Text style={styles.emptyTitle}>
                 No Patrol History
               </Text>
+
               <Text style={styles.emptyText}>
                 Your completed and active patrol sessions will appear here.
               </Text>
@@ -167,7 +192,7 @@ export default function TanodPatrolHistory() {
           )}
         </ScrollView>
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -177,12 +202,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#F7F7FB',
   },
   header: {
-    height: 60,
+    minHeight: 64,
     backgroundColor: '#7777B8',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
+  },
+  backButton: {
+    minWidth: 76,
+    minHeight: 52,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    paddingHorizontal: 8,
   },
   back: {
     color: '#FFFFFF',
@@ -191,12 +223,26 @@ const styles = StyleSheet.create({
   },
   title: {
     color: '#FFFFFF',
-    fontSize: 20,
+    fontSize: 19,
     fontWeight: '700',
+  },
+  headerSpacer: {
+    width: 76,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    color: '#777777',
+    fontSize: 14,
   },
   content: {
     padding: 16,
     paddingBottom: 30,
+    flexGrow: 1,
   },
   card: {
     backgroundColor: '#FFFFFF',
